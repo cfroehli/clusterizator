@@ -30,7 +30,6 @@ def rebuild_clusters(points, n_cluster):
 
     for i, c in enumerate(clusters):
         if not c:
-            print('refill')
             while True:
                 p = random.choice(points)
                 if len(clusters[p.cluster]) > 1:
