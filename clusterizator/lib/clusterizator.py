@@ -16,9 +16,9 @@ class Clusterizator:
         for epoch in range(max_epochs):
             clusters = Clusterizator._rebuild_clusters(points, n_cluster)
             centroids = Clusterizator._find_centroids(clusters)
+            self._render(points, centroids, epoch)
             if not Clusterizator._reassign_points_to_nearest_centroids(points, centroids):
                 break
-            self._render(points, centroids, epoch)
         self._render(points, centroids, epoch=RendererBase.FINAL)
 
         return { 'clusters_ids': Clusterizator.cluster_ids(points), 'clusters_centroids': centroids }
