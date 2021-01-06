@@ -26,7 +26,19 @@ def init_points_from_dataset(dataset, n_cluster):
 def rebuild_clusters(points, n_cluster):
     clusters = [ [] for _ in range(n_cluster) ]
     for p in points:
-        clusters[p.cluster].append(p.coordinates)
+        clusters[p.cluster].append(p.coordinates.tolist())
+
+    for i, c in enumerate(clusters):
+        if not c:
+            print('refill')
+            while True:
+                p = random.choice(points)
+                if len(clusters[p.cluster]) > 1:
+                    clusters[p.cluster].remove(p.coordinates.tolist())
+                    p.cluster = i
+                    c.append(p.coordinates)
+                    break
+
     return clusters
 
 # For each cluster, find the centroid (average points)
@@ -48,13 +60,15 @@ def clusterize(dataset, n_cluster, max_epochs=10):
         reassign_points_to_nearest_centroids(points, centroids)
     return { 'clusters_ids': [ p.cluster for p in points ], 'clusters_centroids': centroids }
 
-# Fake some data by grouping pts around a few areas
-centers = ([6, 4], [-8, -3], [-5, 5])
-n_cluster = len(centers)
-clusters_size = [4] * n_cluster
 
-# Get some points (more or less grouped in blobs)
-dataset = create_dataset(centers, clusters_size)
-# Group them to n_cluster clusters
-results = clusterize(dataset, n_cluster)
-print(results)
+def run():
+    # Fake some data by grouping pts around a few areas
+    centers = ([6, 4], [-8, -3], [-5, 5])
+    n_cluster = len(centers)
+    clusters_size = [8] * n_cluster
+
+    # Get some points (more or less grouped in blobs)
+    dataset = create_dataset(centers, clusters_size)
+    # Group them to n_cluster clusters
+    results = clusterize(dataset, n_cluster)
+    print(results)
