@@ -5,6 +5,7 @@ import numpy as np
 from ..render import RendererBase
 from .cluster_point import ClusterPoint
 
+
 class Clusterizator:
     def __init__(self, dataset, renderer=None):
         self._dataset = dataset
@@ -21,10 +22,10 @@ class Clusterizator:
                 break
         self._render(points, centroids, epoch=RendererBase.FINAL)
 
-        return { 'clusters_ids': Clusterizator.cluster_ids(points), 'clusters_centroids': centroids }
+        return {'clusters_ids': Clusterizator.cluster_ids(points), 'clusters_centroids': centroids}
 
     def _init_points_from_dataset(self, n_cluster):
-        return [ ClusterPoint(d, np.random.randint(n_cluster)) for d in self._dataset ]
+        return [ClusterPoint(d, np.random.randint(n_cluster)) for d in self._dataset]
 
     def _render(self, points, centroids, epoch):
         if self._renderer:
@@ -32,7 +33,7 @@ class Clusterizator:
 
     @staticmethod
     def cluster_ids(points):
-        return [ p.cluster for p in points ]
+        return [p.cluster for p in points]
 
     @staticmethod
     def _ensure_no_empty_cluster(clusters, points):
@@ -52,7 +53,7 @@ class Clusterizator:
 
     @staticmethod
     def _rebuild_clusters(points, n_cluster):
-        clusters = [ [] for _ in range(n_cluster) ]
+        clusters = [[] for _ in range(n_cluster)]
         for p in points:
             clusters[p.cluster].append(p.coordinates)
 
@@ -61,13 +62,13 @@ class Clusterizator:
 
     @staticmethod
     def _find_centroids(clusters):
-        return [ np.mean(c, axis=0) for c in clusters ]
+        return [np.mean(c, axis=0) for c in clusters]
 
     @staticmethod
     def _reassign_points_to_nearest_centroids(points, centroids):
         reassign_occured = False
         for i, p in enumerate(points):
-            dist_to_centroids = [ np.linalg.norm(c - p.coordinates) for c in centroids ]
+            dist_to_centroids = [np.linalg.norm(c - p.coordinates) for c in centroids]
             new_cluster = np.argmin(dist_to_centroids)
             reassign_occured |= new_cluster != p.cluster
             p.cluster = new_cluster

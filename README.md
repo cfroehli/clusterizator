@@ -5,10 +5,18 @@
 # Build
     python3 -m venv myenv
     . ./myenv/bin/activate
+    cd [project_root] 
     pip wheel .
 
+# Test
+    python3 -m venv myenv
+    . ./myenv/bin/activate
+    pip install tox
+    cd [project_root] 
+    tox
+
 # TODO
-    - configure tox / add proper tests
+    - add proper tests
     - reorg code a bit
     - try to make an animated version
     - try to use poetry

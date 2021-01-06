@@ -1,4 +1,6 @@
 \.tox
+\.coverage
+htmlcov
 **/__pycache__
 clusterizator.egg-info
 
