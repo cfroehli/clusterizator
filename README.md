@@ -11,7 +11,7 @@
 # Test
     python3 -m venv myenv
     . ./myenv/bin/activate
-    pip install tox
+    pip install tox-wheel
     cd [project_root] 
     tox
 
