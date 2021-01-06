@@ -56,6 +56,8 @@ def clusterize(dataset, n_cluster, max_epochs=10):
     for _ in range(max_epochs):
         clusters = rebuild_clusters(points, n_cluster)
         centroids = find_centroids(clusters)
+        #TODO: compare centroids between iterations to early-exit when
+        #stable instead of waiting for max_epochs
         reassign_points_to_nearest_centroids(points, centroids)
     return { 'clusters_ids': [ p.cluster for p in points ], 'clusters_centroids': centroids }
 
