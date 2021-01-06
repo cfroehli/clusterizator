@@ -1,3 +1,7 @@
+# CI
+
+[![Build Status](https://travis-ci.com/cfroehli/clusterizator.svg?branch=master)](https://travis-ci.com/cfroehli/clusterizator)
+
 # Build
     python3 -m venv myenv
     . ./myenv/bin/activate
