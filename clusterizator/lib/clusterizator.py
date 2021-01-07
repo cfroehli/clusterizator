@@ -15,17 +15,17 @@ class Clusterizator:
     def run(self, n_cluster, max_epochs=10):
         cluster_map = np.random.randint(n_cluster, size=self.dataset_size)
 
-        self._render(self._dataset, RendererBase.INITIAL, cluster_map, centroids=[])
+        self._render(RendererBase.INITIAL, cluster_map, centroids=[])
         for epoch in range(max_epochs):
             centroids = self._update_clusters(cluster_map, n_cluster)
-            self._render(self._dataset, epoch, cluster_map, centroids)
+            self._render(epoch, cluster_map, centroids)
             if not self._reassign_points_to_nearest_centroids(cluster_map, centroids):
                 break
-        self._render(self._dataset, RendererBase.FINAL, cluster_map, centroids)
+        self._render(RendererBase.FINAL, cluster_map, centroids)
 
         return {'clusters_ids': cluster_map, 'clusters_centroids': centroids}
 
-    def _render(self, cluster_map, centroids, epoch):
+    def _render(self, epoch, cluster_map, centroids):
         if self._renderer:
             self._renderer.render(self._dataset, epoch, cluster_map, centroids)
 
