@@ -19,6 +19,5 @@
 
 # TODO
     - add proper tests/fixtures
-    - reorg code a bit
     - try to make an animated version
     - try to use poetry
