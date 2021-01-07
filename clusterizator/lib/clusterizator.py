@@ -1,16 +1,6 @@
-import random
-
 import numpy as np
 
 from ..render import RendererBase
-from .cluster_point import ClusterPoint
-
-
-def numpy_array_list_remove(array, to_remove):
-    for index, element in enumerate(array):
-        if np.array_equal(to_remove, element):
-            del array[index]
-            break
 
 
 class Clusterizator:
@@ -18,62 +8,50 @@ class Clusterizator:
         self._dataset = dataset
         self._renderer = renderer
 
+    @property
+    def dataset_size(self):
+        return self._dataset.shape[0]
+
     def run(self, n_cluster, max_epochs=10):
-        points = self._init_points_from_dataset(n_cluster)
-        self._render(points, centroids=[], epoch=RendererBase.INITIAL)
+        cluster_map = np.random.randint(n_cluster, size=self.dataset_size)
+
+        self._render(self._dataset, RendererBase.INITIAL, cluster_map, centroids=[])
         for epoch in range(max_epochs):
-            clusters = Clusterizator._rebuild_clusters(points, n_cluster)
-            centroids = Clusterizator._find_centroids(clusters)
-            self._render(points, centroids, epoch)
-            if not Clusterizator._reassign_points_to_nearest_centroids(points, centroids):
+            centroids = self._update_clusters(cluster_map, n_cluster)
+            self._render(self._dataset, epoch, cluster_map, centroids)
+            if not self._reassign_points_to_nearest_centroids(cluster_map, centroids):
                 break
-        self._render(points, centroids, epoch=RendererBase.FINAL)
+        self._render(self._dataset, RendererBase.FINAL, cluster_map, centroids)
 
-        return {'clusters_ids': Clusterizator.cluster_ids(points), 'clusters_centroids': centroids}
+        return {'clusters_ids': cluster_map, 'clusters_centroids': centroids}
 
-    def _init_points_from_dataset(self, n_cluster):
-        return [ClusterPoint(d, np.random.randint(n_cluster)) for d in self._dataset]
-
-    def _render(self, points, centroids, epoch):
+    def _render(self, cluster_map, centroids, epoch):
         if self._renderer:
-            self._renderer.render(self._dataset, epoch, Clusterizator.cluster_ids(points), centroids)
+            self._renderer.render(self._dataset, epoch, cluster_map, centroids)
 
-    @staticmethod
-    def cluster_ids(points):
-        return [p.cluster for p in points]
-
-    @staticmethod
-    def _ensure_no_empty_cluster(clusters, points):
-        for i, c in enumerate(clusters):
-            if not c:
+    def _ensure_no_empty_cluster(self, clusters, cluster_map):
+        for index, cluster in enumerate(clusters):
+            if cluster.size == 0:
                 while True:
-                    p = random.choice(points)
-                    source_cluster = clusters[p.cluster]
-                    if len(source_cluster) > 1:
-                        numpy_array_list_remove(source_cluster, p.coordinates)
-                        p.cluster = i
-                        c.append(p.coordinates)
+                    data_index = np.random.randint(self.dataset_size)
+                    src_cluster_index = cluster_map[data_index]
+                    src_cluster = clusters[src_cluster_index]
+                    if src_cluster.size > 1:
+                        clusters[index] = np.array([data_index])
+                        clusters[src_cluster_index] = src_cluster[src_cluster != data_index]
+                        cluster_map[data_index] = index
                         break
 
-    @staticmethod
-    def _rebuild_clusters(points, n_cluster):
-        clusters = [[] for _ in range(n_cluster)]
-        for p in points:
-            clusters[p.cluster].append(p.coordinates)
+    def _update_clusters(self, cluster_map, n_cluster):
+        clusters = [(cluster_map == cluster_id).nonzero()[0] for cluster_id in range(n_cluster)]
+        self._ensure_no_empty_cluster(clusters, cluster_map)
+        return [np.mean(self._dataset[c], axis=0) for c in clusters]
 
-        Clusterizator._ensure_no_empty_cluster(clusters, points)
-        return clusters
-
-    @staticmethod
-    def _find_centroids(clusters):
-        return [np.mean(c, axis=0) for c in clusters]
-
-    @staticmethod
-    def _reassign_points_to_nearest_centroids(points, centroids):
+    def _reassign_points_to_nearest_centroids(self, cluster_map, centroids):
         reassign_occured = False
-        for i, p in enumerate(points):
-            dist_to_centroids = [np.linalg.norm(c - p.coordinates) for c in centroids]
+        for index, coordinates in enumerate(self._dataset):
+            dist_to_centroids = [np.linalg.norm(c - coordinates) for c in centroids]
             new_cluster = np.argmin(dist_to_centroids)
-            reassign_occured |= new_cluster != p.cluster
-            p.cluster = new_cluster
+            reassign_occured |= new_cluster != cluster_map[index]
+            cluster_map[index] = new_cluster
         return reassign_occured
