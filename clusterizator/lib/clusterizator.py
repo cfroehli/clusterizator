@@ -29,18 +29,21 @@ class Clusterizator:
         if self._renderer:
             self._renderer.render(self._dataset, epoch, cluster_map, centroids)
 
+    def _take_from_another_cluster(self, cluster_to_refill, clusters, cluster_map):
+        while True:
+            data_index = np.random.randint(self.dataset_size)
+            src_cluster_index = cluster_map[data_index]
+            src_cluster = clusters[src_cluster_index]
+            if src_cluster.size > 1:
+                clusters[cluster_to_refill] = np.array([data_index])
+                clusters[src_cluster_index] = src_cluster[src_cluster != data_index]
+                cluster_map[data_index] = cluster_to_refill
+                break
+
     def _ensure_no_empty_cluster(self, clusters, cluster_map):
         for index, cluster in enumerate(clusters):
             if cluster.size == 0:
-                while True:
-                    data_index = np.random.randint(self.dataset_size)
-                    src_cluster_index = cluster_map[data_index]
-                    src_cluster = clusters[src_cluster_index]
-                    if src_cluster.size > 1:
-                        clusters[index] = np.array([data_index])
-                        clusters[src_cluster_index] = src_cluster[src_cluster != data_index]
-                        cluster_map[data_index] = index
-                        break
+                self._take_from_another_cluster(index, clusters, cluster_map)
 
     def _update_clusters(self, cluster_map, n_cluster):
         clusters = [(cluster_map == cluster_id).nonzero()[0] for cluster_id in range(n_cluster)]
