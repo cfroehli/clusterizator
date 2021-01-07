@@ -6,6 +6,13 @@ from ..render import RendererBase
 from .cluster_point import ClusterPoint
 
 
+def numpy_array_list_remove(array, to_remove):
+    for index, element in enumerate(array):
+        if np.array_equal(to_remove, element):
+            del array[index]
+            break
+
+
 class Clusterizator:
     def __init__(self, dataset, renderer=None):
         self._dataset = dataset
@@ -43,10 +50,7 @@ class Clusterizator:
                     p = random.choice(points)
                     source_cluster = clusters[p.cluster]
                     if len(source_cluster) > 1:
-                        for s_i, s_coordinates in enumerate(source_cluster):
-                            if np.array_equal(p.coordinates, s_coordinates):
-                                del source_cluster[s_i]
-                                break
+                        numpy_array_list_remove(source_cluster, p.coordinates)
                         p.cluster = i
                         c.append(p.coordinates)
                         break
