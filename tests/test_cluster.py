@@ -5,7 +5,7 @@ import clusterizator as Ctor
 
 
 def test_cluster():
-    np.random.seed(3)
+    np.random.seed(4)
     cluster_size = 200
     dataset, n_cluster = Ctor.create_3blobs_dataset(cluster_size)
     clusterizator = Ctor.Clusterizator(dataset)
