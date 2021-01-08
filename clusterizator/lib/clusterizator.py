@@ -15,7 +15,7 @@ class Clusterizator:
     def run(self, n_cluster, max_epochs=10):
         cluster_map = np.random.randint(n_cluster, size=self.dataset_size)
 
-        self._render(RendererBase.INITIAL, cluster_map, centroids=[])
+        self._render(RendererBase.INITIAL, cluster_map, centroids=np.empty(shape=(0, 2)))
         for epoch in range(max_epochs):
             centroids = self._update_clusters(cluster_map, n_cluster)
             self._render(epoch, cluster_map, centroids)
@@ -48,7 +48,7 @@ class Clusterizator:
     def _update_clusters(self, cluster_map, n_cluster):
         clusters = [(cluster_map == cluster_id).nonzero()[0] for cluster_id in range(n_cluster)]
         self._ensure_no_empty_cluster(clusters, cluster_map)
-        return [np.mean(self._dataset[c], axis=0) for c in clusters]
+        return np.array([np.mean(self._dataset[c], axis=0) for c in clusters])
 
     def _reassign_points_to_nearest_centroids(self, cluster_map, centroids):
         reassign_occured = False
