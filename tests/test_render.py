@@ -4,7 +4,7 @@ from clusterizator.render import TextRenderer, MatPlotRenderer
 
 
 def test_textrenderer(mocker):
-    renderer = TextRenderer()
+    renderer = TextRenderer(only_results=False)
     print_mock = mocker.patch('builtins.print')
     epoch = np.random.randint(100)
     clusters_ids = np.array([0, 1, 2])

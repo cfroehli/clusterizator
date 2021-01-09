@@ -53,8 +53,8 @@ class Clusterizator:
     def _reassign_points_to_nearest_centroids(self, cluster_map, centroids):
         reassign_occured = False
         for index, coordinates in enumerate(self._dataset):
-            dist_to_centroids = [np.linalg.norm(c - coordinates) for c in centroids]
-            new_cluster = np.argmin(dist_to_centroids)
+            dist_to_centroids = np.linalg.norm(centroids[:, None] - coordinates, axis=2)
+            new_cluster = np.argmin(dist_to_centroids, axis=0)
             reassign_occured |= new_cluster != cluster_map[index]
             cluster_map[index] = new_cluster
         return reassign_occured

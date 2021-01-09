@@ -12,7 +12,7 @@ def test_cluster(cluster_size):
 
     dataset = Ctor.create_3blobs_dataset(cluster_size)
     n_cluster = len(dataset['clusters_size'])
-    clusterizator = Ctor.Clusterizator(dataset['values'])
+    clusterizator = Ctor.Clusterizator(dataset['values'], Ctor.TextRenderer(only_results=True))
     results = clusterizator.run(n_cluster, max_epochs=50)
 
     ids = results['clusters_ids']
