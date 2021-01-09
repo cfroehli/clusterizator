@@ -8,7 +8,7 @@
     python3 -m venv myenv
     . ./myenv/bin/activate
     cd [project_root]
-    pip wheel .
+    pip wheel --no-deps -w dist .
 
 # Test
     python3 -m venv myenv
@@ -16,6 +16,11 @@
     pip install tox-wheel
     cd [project_root]
     tox
+
+# Display coverage
+    tox -- --cov-report html
+    tox -e cov-server
+    open http://localhost:9000/ in a webbrowser
 
 # TODO
     - add proper tests/fixtures
