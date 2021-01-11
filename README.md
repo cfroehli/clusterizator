@@ -24,5 +24,5 @@
 
 # TODO
     - add proper tests/fixtures
-    - try to make an animated version
+    - cover animated_renderer
     - try to use poetry
